@@ -54,11 +54,12 @@ class HashTable:
         '''
         index = self._hash_mod(key)
 
-        if self.storage[index] is None:
+        # if the index is empty insert a linkedpair here and increase the count by 1
+        if self.storage[index] is None: 
             self.storage[index] = LinkedPair(key, value)
             self.count += 1
-        
-        else:
+
+        else: # iterate through linked list; key match = overwrite value; no key match = insert LinkedPair, count + 1
             temp = self.storage[index]
             while temp.next and temp.key != key:
                 temp = temp.next
@@ -66,7 +67,8 @@ class HashTable:
                 temp.value = value
             else:
                 temp.next = LinkedPair(key, value)
-                self.count += 1    
+                self.count += 1  
+
 
     def remove(self, key):
         '''
@@ -78,26 +80,29 @@ class HashTable:
         '''
         index = self._hash_mod(key)
 
-        if self.storage[index] is None:
-            return print(f'{key} not found.')
+        if self.storage[index] is None: # key not found
+            return print(f'{key} not found in table.')
 
-        else: # iterate through linked list to remove value
-            temp = self.storage[index]
+        else: # iterate through linked list; key match = remove value, counter - 1
+            temp = self.storage[index] # get list from storage at index
 
-            if temp.key == key:
-                self.storage[index] = temp.next
+            if temp.key == key: # first key in list is a match
+                self.storage[index] = temp.next # set to next linked pair or None
             
-            while temp.next:
-                next_link = temp.next
+            while temp.next: # other keys in storage
+                next_link = temp.next # get next linked pair in list
 
                 if next_link.key == key:
                     if next_link.next:
                         temp.next = next_link.next
                     else:
                         temp.next = None
-                temp = next_link
+
+                temp = next_link 
         
         self.count -= 1
+        print(f'{key} removed from table.')
+
 
     def retrieve(self, key):
         '''
@@ -109,14 +114,15 @@ class HashTable:
         '''
         index = self._hash_mod(key)
 
-        if self.storage[index] != None:
+        if self.storage[index] is not None:
             temp = self.storage[index]
-            while temp != None:
+            while temp is not None:
                 if temp.key == key:
                     return temp.value
                 temp = temp.next
 
-        return print(f'{key} is not found.')
+        return print(f'{key} not found in table.')
+
 
     def resize(self):
         '''
@@ -135,8 +141,6 @@ class HashTable:
                 current = current.next
         
         self.storage = temp_ht.storage
-
-
 
 if __name__ == "__main__":
     ht = HashTable(2)
