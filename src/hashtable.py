@@ -33,7 +33,10 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        h = 5381
+        for c in key:
+            h = (h * 33) + ord(c)
+        return h
 
 
     def _hash_mod(self, key):
@@ -52,10 +55,12 @@ class HashTable:
 
         Fill this in.
         '''
-        # if (self.count / self.capacity) > 0.8: # double the table size at 80% capacity
-        #     self.resize()
+        # if (self.count / self.capacity) > 0.8: # resize at 80% load capacity
+        #     self.resize()   
 
-        index = self._hash_mod(key)
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
 
         # if the index is empty insert a linkedpair here and increase the count by 1
         if self.storage[index] is None: 
@@ -81,7 +86,9 @@ class HashTable:
 
         Fill this in.
         '''
-        index = self._hash_mod(key)
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
 
         if self.storage[index] is None: # key not found
             return print(f'{key} not found in table.')
@@ -115,7 +122,9 @@ class HashTable:
 
         Fill this in.
         '''
-        index = self._hash_mod(key)
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
 
         if self.storage[index] is not None:
             temp = self.storage[index]
