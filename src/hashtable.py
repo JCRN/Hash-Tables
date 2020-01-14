@@ -12,8 +12,9 @@ class HashTable:
     A hash table that with `capacity` buckets
     that accepts string keys
     '''
-    def __init__(self, capacity):
+    def __init__(self, capacity=2):
         self.capacity = capacity  # Number of buckets in the hash table
+        self.count = 0
         self.storage = [None] * capacity
 
 
@@ -32,7 +33,10 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        h = 5381
+        for c in key:
+            h = (h * 33) + ord(c)
+        return h
 
 
     def _hash_mod(self, key):
@@ -51,8 +55,27 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        # if (self.count / self.capacity) > 0.8: # resize at 80% load capacity
+        #     self.resize()   
 
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
+
+        # if the index is empty insert a linkedpair here and increase the count by 1
+        if self.storage[index] is None: 
+            self.storage[index] = LinkedPair(key, value)
+            self.count += 1
+
+        else: # iterate through linked list; key match = overwrite value; no key match = insert LinkedPair, count + 1
+            temp = self.storage[index]
+            while temp.next and temp.key != key:
+                temp = temp.next
+            if temp.key == key:
+                temp.value = value
+            else:
+                temp.next = LinkedPair(key, value)
+                self.count += 1  
 
 
     def remove(self, key):
@@ -63,7 +86,32 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
+
+        if self.storage[index] is None: # key not found
+            return print(f'{key} not found in table.')
+
+        else: # iterate through linked list; key match = remove value, counter - 1
+            temp = self.storage[index] # get list from storage at index
+
+            if temp.key == key: # first key in list is a match
+                self.storage[index] = temp.next # set to next linked pair or None
+            
+            while temp.next: # other keys in storage
+                next_link = temp.next # get next linked pair in list
+
+                if next_link.key == key:
+                    if next_link.next:
+                        temp.next = next_link.next
+                    else:
+                        temp.next = None
+
+                temp = next_link 
+        
+        self.count -= 1
+        print(f'{key} removed from table.')
 
 
     def retrieve(self, key):
@@ -74,7 +122,18 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        #djb2 hashing
+        hash_key = self._hash_djb2(key)
+        index = hash_key % self.capacity
+
+        if self.storage[index] is not None:
+            temp = self.storage[index]
+            while temp is not None:
+                if temp.key == key:
+                    return temp.value
+                temp = temp.next
+
+        return print(f'{key} not found in table.')
 
 
     def resize(self):
@@ -84,9 +143,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        self.capacity *= 2
+        temp_ht = HashTable(self.capacity)
 
-
+        for thing in self.storage:
+            current = thing
+            while current:
+                temp_ht.insert(current.key, current.value)
+                current = current.next
+        
+        self.storage = temp_ht.storage
 
 if __name__ == "__main__":
     ht = HashTable(2)
