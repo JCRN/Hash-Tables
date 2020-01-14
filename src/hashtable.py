@@ -52,6 +52,9 @@ class HashTable:
 
         Fill this in.
         '''
+        # if (self.count / self.capacity) > 0.8: # double the table size at 80% capacity
+        #     self.resize()
+
         index = self._hash_mod(key)
 
         # if the index is empty insert a linkedpair here and increase the count by 1
